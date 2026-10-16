@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->unsignedTinyInteger('discount_percetn')->nullable();
+            $table->unsignedTinyInteger('discount_percent')->nullable();
             $table->unsignedInteger('stock')->default(0);
-            $table->boolean('is_featured')->default('false');
+            $table->boolean('is_featured')->default(false);
             $table->string('image')->nullable();
             $table->decimal('rating', 2, 1)->default(0);
             $table->unsignedBigInteger('reviews_count')->default(0);
