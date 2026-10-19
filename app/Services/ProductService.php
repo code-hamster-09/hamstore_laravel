@@ -9,7 +9,7 @@ class ProductService
 
     public function getAll()
     {
-        return Product::with(['colors', 'brand_id', 'category_id'])->paginate(20);
+        return Product::with(['colors', 'brand', 'category'])->paginate(20);
     }
 
     public function create(array $data)

@@ -23,7 +23,7 @@ class BrandController extends Controller
     public function store(Request $request, BrandService $service)
     {
         $data = $request->validate([
-            'name' => ['string, between:1,255', 'required'],
+            'name' => ['string', 'between:1,255', 'required'],
         ]);
 
         return $service->create($data);

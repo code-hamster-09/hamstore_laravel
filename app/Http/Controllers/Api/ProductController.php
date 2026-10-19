@@ -23,6 +23,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request, ProductService $service)
     {
+        $seller = $request->user()->id;
         return $service->create($request->validated());
     }
 
