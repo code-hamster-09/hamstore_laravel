@@ -9,28 +9,17 @@ class ProductService
 
     public function getAll()
     {
-        return Product::paginate(20);
+        return Product::with(['colors', 'brand_id', 'category_id'])->paginate(20);
     }
 
-    public function get(int $id)
-    {
-        return Product::find($id);
-    }
-
-    public function create($data)
+    public function create(array $data)
     {
         return Product::create($data);
     }
 
-    public function update(int $id, $data)
+    public function update(array $data)
     {
-        $product = Product::findOrFail($id);
-        return $product->where('id', $id)->update($data);
-    }
-
-    public function delete(int $id)
-    {
-        $product = Product::findOrFail($id);
-        return $product->where('id', $id)->delete();
+        $id = $data['id'];
+        return Product::where('id', $id)->update($data);
     }
 }

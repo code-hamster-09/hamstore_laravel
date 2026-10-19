@@ -3,17 +3,36 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Models\Product;
+use App\Services\ProductService;
 
 class ProductController extends Controller
 {
     //
-    public function index() {}
+    public function index(ProductService $service)
+    {
+        return $service->getAll();
+    }
 
-    public function show() {}
+    public function show(Product $product)
+    {
+        return $product;
+    }
 
-    public function store() {}
+    public function store(StoreProductRequest $request, ProductService $service)
+    {
+        return $service->create($request->validated());
+    }
 
-    public function update() {}
+    public function update(UpdateProductRequest $request, ProductService $service)
+    {
+        return $service->update($request->validated());
+    }
 
-    public function destroy() {}
+    public function destroy(Product $product)
+    {
+        return $product->delete();
+    }
 }
