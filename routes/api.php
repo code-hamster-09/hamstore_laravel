@@ -20,7 +20,7 @@ Route::prefix('/auth')->group(function () {
     });
 });
 
-Route::prefix('/products')->group(function () {
-    Route::apiResource('posts', [ProductController::class]);
-});
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::middleware('auth:sanctum')->apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);
+
 Route::prefix('/brands')->group(function () {});

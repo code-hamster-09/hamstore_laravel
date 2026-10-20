@@ -23,13 +23,13 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request, ProductService $service)
     {
-        $seller = $request->user()->id;
-        return $service->create($request->validated());
+        $user = $request->user();
+        return $service->create($request->validated(), $user);
     }
 
-    public function update(UpdateProductRequest $request, ProductService $service)
+    public function update(UpdateProductRequest $request, ProductService $service, Product $product)
     {
-        return $service->update($request->validated());
+        return $service->update($request->validated(), $product);
     }
 
     public function destroy(Product $product)
