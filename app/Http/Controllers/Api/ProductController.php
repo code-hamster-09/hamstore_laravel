@@ -7,6 +7,7 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use App\Services\ProductService;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -32,8 +33,10 @@ class ProductController extends Controller
         return $service->update($request->validated(), $product);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product, Request $request)
     {
-        return $product->delete();
+        abort_if($product->seller_id !== $request->user()->id, 403);
+        $product->delete();
+        return response()->noContent();
     }
 }

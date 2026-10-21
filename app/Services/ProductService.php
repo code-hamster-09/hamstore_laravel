@@ -18,11 +18,9 @@ class ProductService
     {
         return DB::transaction(function () use ($data, $user) {
             $product = $user->products()->create($data);
-            if ($data['color_ids']) {
-                $ids = $data['color_ids'];
-                $product->colors()->sync($ids);
-            }
-            return $product->fresh()->with(['colors', 'brand', 'category']);
+            $ids = $data['color_ids'];
+            $product->colors()->sync($ids);
+            return $product->fresh()->load(['colors', 'brand', 'category']);
         });
     }
 
@@ -30,9 +28,11 @@ class ProductService
     {
         return DB::transaction(function () use ($data, $product) {
             $product->update($data);
-            $ids = $data['color_ids'];
-            $product->colors()->sync($ids);
-            return $product->fresh()->with(['colors', 'brand', 'category']);
+            if (isset($data['color_ids'])) {
+                $ids = $data['color_ids'];
+                $product->colors()->sync($ids);
+            }
+            return $product->fresh()->load(['colors', 'brand', 'category']);
         });
     }
 }
