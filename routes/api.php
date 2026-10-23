@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,5 +23,7 @@ Route::prefix('/auth')->group(function () {
 
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 Route::middleware('auth:sanctum')->apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);
+
+Route::middleware('auth:sanctum')->apiResource('cart-items', CartController::class)->except(['show']);
 
 Route::prefix('/brands')->group(function () {});

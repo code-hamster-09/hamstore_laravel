@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('brand_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
+            $table->integer('price');
             $table->unsignedTinyInteger('discount_percent')->nullable();
             $table->unsignedInteger('stock')->default(0);
             $table->boolean('is_featured')->default(false);

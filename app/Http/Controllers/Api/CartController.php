@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     //
-    public function getAll(Request $request)
+    public function index(Request $request)
     {
-        return $request->user()->cartItems()->paginate(20);
+        return $request->user()->cartItems()->with(['product'])->paginate(20);
     }
 
     public function store(Request $request)
@@ -28,8 +28,25 @@ class CartController extends Controller
         ], ['quantity' => $cartItem['quantity']]);
     }
 
-    public function destroy(Request $request)
+    public function update(CartItem $cartItem, Request $request)
     {
-        return $request->delete();
+        abort_if($request->user()->id != $cartItem->user_id, 403);
+
+        $newQuantity = $request->validate([
+            'quantity' => ['integer', 'required', 'between:1,100']
+        ]);
+
+        $cartItem->update([
+            'quantity' => $newQuantity['quantity']
+        ]);
+
+        return response()->json(['success' => true, 'cartItem' => $cartItem]);
+    }
+
+    public function destroy(CartItem $cartItem, Request $request)
+    {
+        abort_if($request->user()->id != $cartItem->user_id, 403);
+        $cartItem->delete();
+        return response()->noContent();
     }
 }
