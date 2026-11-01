@@ -16,9 +16,11 @@ return new class extends Migration
 
             $table->foreignId('order_id')->constrained()->restrictOnDelete();
             $table->foreignId('product_id')->constrained()->restrictOnDelete();
+            $table->foreignId('color_id')->constrained()->restrictOnDelete();
             $table->string('product_name');
             $table->unsignedBigInteger('price');
             $table->unsignedInteger('quantity')->default(1);
+            $table->string('hex', 7);
 
             $table->index('order_id');
             $table->timestamps();

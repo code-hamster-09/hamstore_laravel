@@ -19,7 +19,21 @@ class BrandSeeder extends Seeder
             'EcoWear',
             'FitTech',
             'UrbanStyle',
-            'ChargeTech'
+            'ChargeTech',
+            'Apple',
+            'Samsung',
+            'Sony',
+            'Casio',
+            'Nike',
+            'Zara',
+            'IKEA',
+            'LEGO',
+            'Mattel',
+            'Adidas',
+            'Puma',
+            'Purina',
+            'Moleskine',
+            'Samsonite'
         ];
 
         foreach ($brands as $name) {

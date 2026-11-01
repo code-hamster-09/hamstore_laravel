@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
@@ -19,12 +21,19 @@ class CartController extends Controller
         $user = $request->user()->id;
         $cartItem = $request->validate([
             'product_id' => ['integer', 'required', 'exists:products,id'],
-            'quantity' => ['integer', 'required', 'min:1']
+            'quantity' => ['integer', 'required', 'min:1'],
+            'color_id' => ['integer', 'required', 'exists:colors,id'],
         ]);
+
+        $product = Product::find($cartItem['product_id']);
+        $colorExists = $product->colors()->where('colors.id', $cartItem['color_id'])->exists();
+
+        if (!$colorExists) return throw ValidationException::withMessages(['color_id' => 'This product does not have this color']);
 
         return CartItem::firstOrCreate([
             'user_id' => $user,
-            'product_id' => $cartItem['product_id']
+            'product_id' => $cartItem['product_id'],
+            'color_id' => $cartItem['color_id'],
         ], ['quantity' => $cartItem['quantity']]);
     }
 

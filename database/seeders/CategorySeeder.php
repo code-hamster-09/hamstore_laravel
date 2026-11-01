@@ -17,6 +17,11 @@ class CategorySeeder extends Seeder
             'Electronics',
             'Accessories',
             'Clothing',
+            'Furniture',
+            'Toys',
+            'Sports',
+            'Pet Supplies',
+            'Books & Stationery',
         ];
 
         foreach ($categories as $category) {
