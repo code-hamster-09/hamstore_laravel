@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +15,6 @@ Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 
-
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('logoutAll', [AuthController::class, 'logoutAll']);
@@ -25,5 +25,7 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 Route::middleware('auth:sanctum')->apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);
 
 Route::middleware('auth:sanctum')->apiResource('cart-items', CartController::class)->except(['show']);
+
+Route::post('/webhooks/fakepay', [PaymentWebhookController::class, 'handle']);
 
 Route::prefix('/brands')->group(function () {});

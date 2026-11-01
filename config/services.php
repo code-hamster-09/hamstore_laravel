@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'fakepay' => [
+        'secret' => env('FAKEPAY_SECRET'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

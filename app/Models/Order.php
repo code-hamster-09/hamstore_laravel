@@ -11,7 +11,7 @@ class Order extends Model
     //
     protected $fillable = [
         'status',
-        'total_sum'
+        'total_sum',
     ];
 
     public function user(): BelongsTo
@@ -22,5 +22,10 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 }
