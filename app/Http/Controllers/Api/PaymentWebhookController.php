@@ -25,7 +25,16 @@ class PaymentWebhookController extends Controller
             $id = $request->payment_id;
             $payment = Payment::query()->where('provider_payment_id', $id)->lockForUpdate()->firstOrFail();
 
-            if ($payment->status === 'paid') {
+            $providerAmount = $request->input('amount');
+            $amount = $payment->amount;
+
+            if ($payment->status !== 'pending') {
+                return response()->json(['status' => 'success'], 200);
+            }
+
+            if ($amount != $providerAmount || $request->input('status') !== 'paid') {
+                $payment->update(['status' => 'failed']);
+
                 return response()->json(['status' => 'success'], 200);
             }
 
