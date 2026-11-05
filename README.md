@@ -1,58 +1,56 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HamStore — Laravel API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Бэкенд интернет-магазина. Пет-проект, на котором я разбираю реальные задачи e-commerce: авторизацию, работу с заказами и приём оплаты.
 
-## About Laravel
+- Фронтенд (Next.js): [code-hamster-09/ham-store](https://github.com/code-hamster-09/ham-store) · демо: [ham-store.vercel.app](https://ham-store.vercel.app)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Стек
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.3, Laravel 13, Laravel Sanctum
+- PostgreSQL 16
+- Docker (php-fpm, nginx, postgres)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Реализовано
 
-## Learning Laravel
+- **Авторизация** через Sanctum-токены: регистрация, логин, выход с текущего или со всех устройств.
+- **Товары**: CRUD с бренд-, категорийными и цветовыми связями. Изменять и удалять товар может только его продавец. Удаление мягкое (soft delete), поэтому старые заказы не ломаются.
+- **Корзина**: CRUD позиций с проверкой владельца. Уникальность позиции задаётся связкой товар + цвет.
+- **Заказы**: модели заказа и позиций. В позиции сохраняется снимок цены и названия на момент покупки.
+- **Оплата**:
+  - провайдер подключён через интерфейс `PaymentGateway` и DI-контейнер, новый провайдер добавляется без правок бизнес-логики;
+  - вебхук проверяет HMAC-подпись через `hash_equals`;
+  - идемпотентность: строка платежа блокируется `lockForUpdate`, повторно проверяется статус, сверяется сумма;
+  - деньги хранятся целым числом в минимальных единицах.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## В планах
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Оформление заказа (checkout) с блокировкой остатков
+- Сверка зависших платежей по расписанию (Scheduler)
+- Очереди для уведомлений
+- Feature-тесты вебхука и корзины
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Запуск
 
 ```bash
-composer require laravel/boost --dev
+git clone https://github.com/code-hamster-09/hamstore_laravel.git
+cd hamstore_laravel
+cp .env.example .env   # БД уже настроена под docker, задай FAKEPAY_SECRET
 
-php artisan boost:install
+docker compose -f docker/docker-compose.yml up -d --build
+docker compose -f docker/docker-compose.yml exec app composer install
+docker compose -f docker/docker-compose.yml exec app php artisan key:generate
+docker compose -f docker/docker-compose.yml exec app php artisan migrate --seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+API доступно на `http://localhost:8080/api`.
 
-## Contributing
+## Основные эндпоинты
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Метод | Путь | Доступ |
+|---|---|---|
+| POST | `/api/auth/register`, `/api/auth/login` | публичный |
+| POST | `/api/auth/logout`, `/api/auth/logoutAll` | токен |
+| GET | `/api/products`, `/api/products/{id}` | публичный |
+| POST / PUT / DELETE | `/api/products`, `/api/products/{id}` | токен, только продавец |
+| GET / POST / PATCH / DELETE | `/api/cart-items` | токен, только владелец |
+| POST | `/api/webhooks/fakepay` | подпись HMAC |
