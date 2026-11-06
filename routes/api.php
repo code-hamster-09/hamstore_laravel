@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
@@ -25,6 +26,8 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 Route::middleware('auth:sanctum')->apiResource('products', ProductController::class)->only(['store', 'update', 'destroy']);
 
 Route::middleware('auth:sanctum')->apiResource('cart-items', CartController::class)->except(['show']);
+
+Route::middleware('auth:sanctum')->post('/orders', [OrderController::class, 'store']);
 
 Route::post('/webhooks/fakepay', [PaymentWebhookController::class, 'handle']);
 
