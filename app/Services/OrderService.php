@@ -2,16 +2,24 @@
 
 namespace App\Services;
 
+use App\Contracts\PaymentGateway;
+use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-    public function create()
+    protected PaymentGateway $payment;
+
+    public function __construct(PaymentGateway $payment)
     {
-        $user = Auth::user();
+        $this->payment = $payment;
+    }
+
+    public function create(User $user)
+    {
 
         return DB::transaction(function () use ($user) {
             $cartItems = $user->cartItems()->with('color')->get();
@@ -67,5 +75,16 @@ class OrderService
             return $order->load(['items']);
         });
 
+    }
+
+    public function start(Order $order)
+    {
+        $payment = $this->payment->createPayment($order->total_sum, $order->id);
+        $order->payments()->create([
+            'provider_payment_id' => $payment['payment_id'],
+            'amount' => $order->total_sum,
+        ]);
+
+        return $payment['redirect_url'];
     }
 }

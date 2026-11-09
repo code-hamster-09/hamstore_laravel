@@ -16,7 +16,7 @@ class FakePaymentGateway implements PaymentGateway
 
         return [
             'payment_id' => $uuid,
-            'redirect_url' => 'http://localhost:8080/fake-pay/'.$uuid,
+            'redirect_url' => 'http://localhost:8080/fakepay/'.$uuid,
         ];
     }
 

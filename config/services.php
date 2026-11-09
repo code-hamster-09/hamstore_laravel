@@ -16,6 +16,7 @@ return [
 
     'fakepay' => [
         'secret' => env('FAKEPAY_SECRET'),
+        'url' => env('FAKEPAY_URL'),
     ],
 
     'postmark' => [

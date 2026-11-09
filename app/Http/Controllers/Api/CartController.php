@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class CartController extends Controller
 {
@@ -20,15 +19,13 @@ class CartController extends Controller
     {
         $user = $request->user()->id;
         $cartItem = $request->validate([
-            'product_id' => ['integer', 'required', 'exists:products,id'],
+            'product_id' => ['integer', 'required', Rule::exists('products', 'id')->whereNull('deleted_at')],
             'quantity' => ['integer', 'required', 'min:1'],
-            'color_id' => ['integer', 'required', 'exists:colors,id'],
+            'color_id' => ['integer', 'required',
+                Rule::exists('color_product', 'color_id')
+                    ->where('product_id', $request->input('product_id')),
+            ],
         ]);
-
-        $product = Product::find($cartItem['product_id']);
-        $colorExists = $product->colors()->where('colors.id', $cartItem['color_id'])->exists();
-
-        if (!$colorExists) return throw ValidationException::withMessages(['color_id' => 'This product does not have this color']);
 
         return CartItem::firstOrCreate([
             'user_id' => $user,
@@ -42,11 +39,11 @@ class CartController extends Controller
         abort_if($request->user()->id != $cartItem->user_id, 403);
 
         $newQuantity = $request->validate([
-            'quantity' => ['integer', 'required', 'between:1,100']
+            'quantity' => ['integer', 'required', 'between:1,100'],
         ]);
 
         $cartItem->update([
-            'quantity' => $newQuantity['quantity']
+            'quantity' => $newQuantity['quantity'],
         ]);
 
         return response()->json(['success' => true, 'cartItem' => $cartItem]);
@@ -56,6 +53,7 @@ class CartController extends Controller
     {
         abort_if($request->user()->id != $cartItem->user_id, 403);
         $cartItem->delete();
+
         return response()->noContent();
     }
 }

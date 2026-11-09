@@ -29,6 +29,8 @@ Route::middleware('auth:sanctum')->apiResource('cart-items', CartController::cla
 
 Route::middleware('auth:sanctum')->post('/orders', [OrderController::class, 'store']);
 
+Route::middleware('auth:sanctum')->post('/orders/{order}/pay', [OrderController::class, 'pay']);
+
 Route::post('/webhooks/fakepay', [PaymentWebhookController::class, 'handle']);
 
 Route::prefix('/brands')->group(function () {});
